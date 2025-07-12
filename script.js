@@ -123,13 +123,17 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        const {
-            data: { user },
-        } = await supabase.auth.getUser();
+        const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+        if (sessionError || !sessionData.session) {
+            alert('User not authenticated.');
+            return;
+        }
+
+        const userId = sessionData.session.user.id;
 
         const { error } = await supabase.from('notes').insert([
             {
-                user_id: user.id,
+                user_id: userId,
                 content: content,
             },
         ]);
@@ -144,15 +148,19 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     async function loadNotes() {
-        const {
-            data: { user },
-        } = await supabase.auth.getUser();
+        const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+        if (sessionError || !sessionData.session) {
+            alert('User not authenticated.');
+            return;
+        }
+
+        const userId = sessionData.session.user.id;
 
         const { data: notes, error } = await supabase
             .from('notes')
             .select('*')
-            .eq('user_id', user.id)
-            .order('inserted_at', { ascending: false });
+            .eq('user_id', userId)
+            .order('created_at', { ascending: false });
 
         savedNotesList.innerHTML = '';
 
