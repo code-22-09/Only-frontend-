@@ -1,0 +1,191 @@
+/* Basic Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+    background-color: #f4f4f4;
+    color: #333;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+header {
+    background: #333;
+    color: #fff;
+    padding: 1rem 0;
+    text-align: center;
+}
+
+header h1 {
+    margin-bottom: 10px;
+}
+
+nav button {
+    background: #555;
+    color: #fff;
+    border: none;
+    padding: 8px 15px;
+    margin: 0 5px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+nav button:hover:not(.active) {
+    background: #777;
+}
+
+nav button.active {
+    background: #007bff; /* Highlight active button */
+    cursor: default;
+}
+
+main {
+    flex-grow: 1;
+    padding: 20px;
+    max-width: 900px;
+    margin: 20px auto;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.page {
+    display: none; /* Hidden by default */
+}
+
+.page.active {
+    display: block; /* Shown when active */
+}
+
+h2 {
+    color: #007bff;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+form label {
+    font-weight: bold;
+}
+
+form input[type="text"],
+form input[type="password"],
+form input[type="file"],
+textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 1rem;
+}
+
+form button, #save-note-btn {
+    background: #28a745;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background 0.3s ease;
+}
+
+form button:hover, #save-note-btn:hover {
+    background: #218838;
+}
+
+#auth-form button[type="button"] { /* For the Register button */
+    background: #6c757d;
+}
+
+#auth-form button[type="button"]:hover {
+    background: #5a6268;
+}
+
+ul {
+    list-style: none;
+    padding: 0;
+}
+
+ul li {
+    background: #f9f9f9;
+    border: 1px solid #eee;
+    padding: 10px 15px;
+    margin-bottom: 8px;
+    border-radius: 4px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+ul li a {
+    color: #007bff;
+    text-decoration: none;
+}
+
+ul li a:hover {
+    text-decoration: underline;
+}
+
+.note-editor textarea {
+    margin-bottom: 10px;
+}
+
+.saved-notes ul li h4 {
+    margin-bottom: 5px;
+    color: #555;
+}
+
+.saved-notes ul li p {
+    font-size: 0.9em;
+    color: #666;
+    flex-grow: 1; /* Allow content to take space */
+    margin-right: 15px; /* Space between text and buttons */
+}
+
+.edit-note-btn, .delete-note-btn {
+    background: #007bff;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    margin-left: 5px;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 0.8em;
+}
+
+.delete-note-btn {
+    background: #dc3545;
+}
+
+.edit-note-btn:hover { background: #0056b3; }
+.delete-note-btn:hover { background: #c82333; }
+
+
+footer {
+    text-align: center;
+    padding: 20px;
+    background: #333;
+    color: #fff;
+    margin-top: 20px;
+}
+
+/* Hide navigation and main content until login */
+body.logged-out #main-nav,
+body.logged-out main section:not(#login-section) {
+    display: none;
+  }
