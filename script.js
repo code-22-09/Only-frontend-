@@ -1,3 +1,9 @@
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
+
+const supabaseUrl = 'https://ndzrnskgaoltomqttdpz.supabase.co'
+const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5kenJuc2tnYW9sdG9tcXR0ZHB6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTIzMjU0MDksImV4cCI6MjA2NzkwMTQwOX0.Xx1AsQXSfi1nW0gfrehufvrFN7KwveI1bJ2y84p_LQM'
+
+const supabase = createClient(supabaseUrl, supabaseKey)
 document.addEventListener('DOMContentLoaded', () => {
     const loginSection = document.getElementById('login-section');
     const dashboardSection = document.getElementById('dashboard-section');
