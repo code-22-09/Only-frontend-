@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Personal Vault</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <header>
+        <h1>My Personal Vault</h1>
+        <nav id="main-nav">
+            <button id="nav-dashboard" class="active">Dashboard</button>
+            <button id="nav-upload">Upload Files</button>
+            <button id="nav-notes">Notes</button>
+            <button id="nav-logout">Logout</button>
+        </nav>
+    </header>
+
+    <main>
+        <section id="login-section" class="page active">
+            <h2>Login / Register</h2>
+            <form id="auth-form">
+                <label for="username">Username:</label>
+                <input type="text" id="username" name="username" required>
+
+                <label for="password">Password:</label>
+                <input type="password" id="password" name="password" required>
+
+                <button type="submit">Login</button>
+                <button type="button" id="show-register">Register</button>
+            </form>
+            <div id="registration-message" style="display: none;">
+                <p>Registration is not yet active. Please use "user" and "password" to login for now.</p>
+            </div>
+        </section>
+
+        <section id="dashboard-section" class="page">
+            <h2>Your Dashboard</h2>
+            <p>Welcome! Here you'll see your files and notes.</p>
+            <div class="file-list">
+                <h3>My Files</h3>
+                <ul id="files-container">
+                    <li><a href="#">My_Vacation_Photos.zip</a> (25 MB)</li>
+                    <li><a href="#">Important_Document.pdf</a> (1.2 MB)</li>
+                    <li><a href="#">Project_Plan.docx</a> (500 KB)</li>
+                    </ul>
+            </div>
+            <div class="note-list">
+                <h3>My Recent Notes</h3>
+                <ul id="notes-container">
+                    <li>Meeting notes for 2025-07-11</li>
+                    <li>Ideas for new project</li>
+                    </ul>
+            </div>
+        </section>
+
+        <section id="upload-section" class="page">
+            <h2>Upload New Files</h2>
+            <form id="upload-form">
+                <label for="file-input">Select File(s):</label>
+                <input type="file" id="file-input" name="files" multiple>
+                <p>Supported formats: PDF, DOCX, JPG, PNG, MP4, etc.</p>
+                <button type="submit">Upload</button>
+            </form>
+            <div id="upload-status" style="display: none; margin-top: 15px;">
+                <p>File upload functionality will be active once backend is implemented.</p>
+            </div>
+        </section>
+
+        <section id="notes-section" class="page">
+            <h2>My Notes</h2>
+            <div class="note-editor">
+                <h3>New Note</h3>
+                <textarea id="note-editor-textarea" placeholder="Start typing your note here..." rows="10"></textarea>
+                <button id="save-note-btn">Save Note</button>
+            </div>
+            <div class="saved-notes">
+                <h3>Saved Notes</h3>
+                <ul id="saved-notes-list">
+                    <li>
+                        <h4>Note Title 1</h4>
+                        <p>This is a sample note content. You can add more text here.</p>
+                        <button class="edit-note-btn">Edit</button>
+                        <button class="delete-note-btn">Delete</button>
+                    </li>
+                    <li>
+                        <h4>Note Title 2</h4>
+                        <p>Another example note.</p>
+                        <button class="edit-note-btn">Edit</button>
+                        <button class="delete-note-btn">Delete</button>
+                    </li>
+                </ul>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 My Personal Vault. All rights reserved.</p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
