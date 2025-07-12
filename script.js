@@ -9,6 +9,45 @@ document.addEventListener('DOMContentLoaded', () => {
     const dashboardSection = document.getElementById('dashboard-section');
     const uploadSection = document.getElementById('upload-section');
     const notesSection = document.getElementById('notes-section');
+    const authForm = document.getElementById('auth-form');
+const registerBtn = document.getElementById('show-register');
+
+authForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const email = document.getElementById('username').value;
+    const password = document.getElementById('password').value;
+
+    const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password
+    });
+
+    if (error) {
+        alert('Login failed: ' + error.message);
+    } else {
+        alert('Login successful!');
+        // Switch to dashboard
+        document.getElementById('login-section').classList.remove('active');
+        document.getElementById('dashboard-section').classList.add('active');
+    }
+});
+
+registerBtn.addEventListener('click', async () => {
+    const email = document.getElementById('username').value;
+    const password = document.getElementById('password').value;
+
+    const { data, error } = await supabase.auth.signUp({
+        email,
+        password
+    });
+
+    if (error) {
+        alert('Registration failed: ' + error.message);
+    } else {
+        alert('Registration successful! Check your email to confirm.');
+    }
+});
 
     const navDashboardBtn = document.getElementById('nav-dashboard');
     const navUploadBtn = document.getElementById('nav-upload');
