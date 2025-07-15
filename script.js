@@ -1,3 +1,9 @@
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+
+const supabaseUrl = 'https://knmpxdnjaypqgzvjtdpt.supabase.co';
+const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtubXB4ZG5qYXlwcWd6dmp0ZHB0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI1MzY1ODAsImV4cCI6MjA2ODExMjU4MH0.nBOyp6hiRg2-3eLvucUKjXelVMtdhhhJEZKsxrA7gGs';
+const supabase = createClient(supabaseUrl, supabaseKey);
+
 document.addEventListener('DOMContentLoaded', () => {
     const loginSection = document.getElementById('login-section');
     const dashboardSection = document.getElementById('dashboard-section');
@@ -13,115 +19,161 @@ document.addEventListener('DOMContentLoaded', () => {
     const usernameInput = document.getElementById('username');
     const passwordInput = document.getElementById('password');
     const registrationMessage = document.getElementById('registration-message');
-    const showRegisterBtn = document.getElementById('show-register'); // Added this button
+    const showRegisterBtn = document.getElementById('show-register');
 
     const uploadForm = document.getElementById('upload-form');
     const uploadStatus = document.getElementById('upload-status');
+    const filesContainer = document.getElementById('files-container');
 
     const saveNoteBtn = document.getElementById('save-note-btn');
     const noteEditorTextarea = document.getElementById('note-editor-textarea');
+    const notesContainer = document.getElementById('saved-notes-list');
 
-    let isLoggedIn = false; // Simulate login state
+    let currentUser = null;
 
-    // Function to show a specific page and hide others
     function showPage(pageToShow) {
         const pages = document.querySelectorAll('.page');
         pages.forEach(page => page.classList.remove('active'));
         pageToShow.classList.add('active');
 
-        // Update active navigation button
         document.querySelectorAll('#main-nav button').forEach(btn => btn.classList.remove('active'));
         if (pageToShow === dashboardSection) navDashboardBtn.classList.add('active');
         else if (pageToShow === uploadSection) navUploadBtn.classList.add('active');
         else if (pageToShow === notesSection) navNotesBtn.classList.add('active');
     }
 
-    // Handle initial state (logged out)
     function setLoggedOutState() {
-        isLoggedIn = false;
-        document.body.classList.add('logged-out'); // Hides nav and main content
-        showPage(loginSection); // Only show login
-        // Clear inputs
+        currentUser = null;
+        document.body.classList.add('logged-out');
+        showPage(loginSection);
         usernameInput.value = '';
         passwordInput.value = '';
     }
 
     function setLoggedInState() {
-        isLoggedIn = true;
-        document.body.classList.remove('logged-out'); // Shows nav and main content
-        showPage(dashboardSection); // Go to dashboard after login
+        document.body.classList.remove('logged-out');
+        showPage(dashboardSection);
+        loadFiles();
+        loadNotes();
     }
 
-    // Event Listeners for Navigation
     navDashboardBtn.addEventListener('click', () => {
-        if (isLoggedIn) showPage(dashboardSection);
+        if (currentUser) showPage(dashboardSection);
         else alert('Please login first.');
     });
     navUploadBtn.addEventListener('click', () => {
-        if (isLoggedIn) showPage(uploadSection);
+        if (currentUser) showPage(uploadSection);
         else alert('Please login first.');
     });
     navNotesBtn.addEventListener('click', () => {
-        if (isLoggedIn) showPage(notesSection);
+        if (currentUser) showPage(notesSection);
         else alert('Please login first.');
     });
-    navLogoutBtn.addEventListener('click', () => {
-        if (confirm('Are you sure you want to log out?')) {
-            setLoggedOutState();
-            alert('Logged out successfully.');
-        }
+    navLogoutBtn.addEventListener('click', async () => {
+        await supabase.auth.signOut();
+        alert('Logged out successfully.');
+        setLoggedOutState();
     });
 
-    // Handle Login/Register Form Submission
-    authForm.addEventListener('submit', (event) => {
-        event.preventDefault(); // Prevent default form submission
-
-        const username = usernameInput.value;
+    authForm.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const email = usernameInput.value;
         const password = passwordInput.value;
 
-        // --- STATIC LOGIN SIMULATION ---
-        if (username === 'user' && password === 'password') { // <-- THIS IS THE CHECK
+        const { data, error } = await supabase.auth.signInWithPassword({
+            email,
+            password
+        });
+
+        if (error) {
+            alert('Invalid email or password.');
+        } else {
+            currentUser = data.user;
             alert('Login successful!');
             setLoggedInState();
-        } else {
-            alert('Invalid username or password. Please try "user" and "password".'); // <-- THIS IS THE MESSAGE
         }
-        // In the backend phase, this is where you'd send credentials to your server
     });
 
-    showRegisterBtn.addEventListener('click', () => {
-        registrationMessage.style.display = 'block';
-        alert('Registration functionality will be implemented in the backend phase.');
+    showRegisterBtn.addEventListener('click', async () => {
+        const email = usernameInput.value;
+        const password = passwordInput.value;
+
+        const { error } = await supabase.auth.signUp({
+            email,
+            password
+        });
+
+        if (error) {
+            alert('Registration failed: ' + error.message);
+        } else {
+            alert('Registration successful! Check your email to confirm.');
+        }
     });
 
-    // Handle File Upload Form Submission (static)
-    uploadForm.addEventListener('submit', (event) => {
+    uploadForm.addEventListener('submit', async (event) => {
         event.preventDefault();
         const files = document.getElementById('file-input').files;
         if (files.length > 0) {
-            uploadStatus.textContent = `Simulating upload of ${files.length} file(s)...`;
+            for (const file of files) {
+                const { error } = await supabase.storage.from('user-files').upload(`${currentUser.id}/${file.name}`, file);
+                if (error) {
+                    alert('Error uploading: ' + file.name);
+                }
+            }
+            uploadStatus.textContent = `${files.length} file(s) uploaded successfully.`;
             uploadStatus.style.display = 'block';
-            alert(`Simulated upload for: ${Array.from(files).map(f => f.name).join(', ')}. Functionality for real upload will come with backend.`);
-            // In the backend phase, files would be sent via FormData to your server
+            loadFiles();
         } else {
             alert('Please select files to upload.');
             uploadStatus.style.display = 'none';
         }
     });
 
-    // Handle Save Note Button (static)
-    saveNoteBtn.addEventListener('click', () => {
+    async function loadFiles() {
+        if (!currentUser) return;
+        const { data } = await supabase.storage.from('user-files').list(`${currentUser.id}/`);
+        filesContainer.innerHTML = '';
+        data?.forEach(file => {
+            const li = document.createElement('li');
+            li.innerHTML = `<a href="${supabase.storage.from('user-files').getPublicUrl(`${currentUser.id}/${file.name}`).data.publicUrl}" target="_blank">${file.name}</a>`;
+            filesContainer.appendChild(li);
+        });
+    }
+
+    saveNoteBtn.addEventListener('click', async () => {
         const noteContent = noteEditorTextarea.value.trim();
-        if (noteContent) {
-            alert('Note saved (simulated): ' + noteContent.substring(0, 50) + '... Full save functionality will come with backend.');
-            noteEditorTextarea.value = ''; // Clear after "saving"
-            // In the backend phase, this note would be sent to your server
-        } else {
+        if (!noteContent) {
             alert('Note content cannot be empty.');
+            return;
         }
+        await supabase.from('notes').insert({
+            user_id: currentUser.id,
+            title: 'Untitled',
+            content: noteContent
+        });
+        alert('Note saved.');
+        noteEditorTextarea.value = '';
+        loadNotes();
     });
 
-    // Initialize state
-    setLoggedOutState();
+    async function loadNotes() {
+        if (!currentUser) return;
+        const { data } = await supabase.from('notes').select().eq('user_id', currentUser.id);
+        notesContainer.innerHTML = '';
+        data?.forEach(note => {
+            const li = document.createElement('li');
+            li.innerHTML = `<h4>${note.title}</h4><p>${note.content}</p>`;
+            notesContainer.appendChild(li);
+        });
+    }
+
+    (async () => {
+        const { data } = await supabase.auth.getSession();
+        if (data.session) {
+            currentUser = data.session.user;
+            setLoggedInState();
+        } else {
+            setLoggedOutState();
+        }
+    })();
 });
-            
