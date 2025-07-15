@@ -2,85 +2,106 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Personal Vault</title>
-    <link rel="stylesheet" href="style.css">
+    <title>My Personal Vault - Dashboard</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+            padding: 20px;
+        }
+        .dashboard {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        h2 {
+            color: #007bff;
+        }
+        h3 {
+            margin-top: 20px;
+            color: #333;
+        }
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+        li {
+            padding: 5px 0;
+            border-bottom: 1px solid #eee;
+        }
+    </style>
 </head>
 <body>
+    <div class="dashboard">
+        <h2>Your Dashboard</h2>
+        <p>Welcome! Here you'll see your files and notes.</p>
+        <h3>My Files</h3>
+        <ul id="files-list"></ul>
 
-    <header>
-        <h1>My Personal Vault</h1>
-        <nav id="main-nav">
-            <button id="nav-dashboard" class="active">Dashboard</button>
-            <button id="nav-upload">Upload Files</button>
-            <button id="nav-notes">Notes</button>
-            <button id="nav-logout">Logout</button>
-        </nav>
-    </header>
+        <h3>My Recent Notes</h3>
+        <ul id="notes-list"></ul>
+    </div>
 
-    <main>
-        <section id="login-section" class="page active">
-            <h2>Login / Register</h2>
-            <form id="auth-form">
-                <label for="username">Username (Email):</label>
-                <input type="text" id="username" name="username" required>
+    <script>
+        const supabaseUrl = 'https://knmpxdnjaypqgzvjtdpt.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtubXB4ZG5qYXlwcWd6dmp0ZHB0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI1MzY1ODAsImV4cCI6MjA2ODExMjU4MH0.nBOyp6hiRg2-3eLvucUKjXelVMtdhhhJEZKsxrA7gGs';
+        const supabase = supabase.createClient(supabaseUrl, supabaseKey);
 
-                <label for="password">Password:</label>
-                <input type="password" id="password" name="password" required>
+        async function loadDashboard() {
+            const { data: { user }, error } = await supabase.auth.getUser();
+            if (error || !user) {
+                alert('You are not logged in.');
+                window.location.href = 'login.html'; // redirect to login page if needed
+                return;
+            }
+            const userId = user.id;
 
-                <button type="submit">Login</button>
-                <button type="button" id="show-register">Register</button>
-            </form>
-            <div id="registration-message" style="display: none;">
-                <p>Registration will require confirmation via email.</p>
-            </div>
-        </section>
+            loadFiles(userId);
+            loadNotes(userId);
+        }
 
-        <section id="dashboard-section" class="page">
-            <h2>Your Dashboard</h2>
-            <p>Welcome! Here you'll see your files and notes.</p>
-            <div class="file-list">
-                <h3>My Files</h3>
-                <ul id="files-container"></ul>
-            </div>
-            <div class="note-list">
-                <h3>My Recent Notes</h3>
-                <ul id="saved-notes-list"></ul>
-            </div>
-        </section>
+        async function loadFiles(userId) {
+            const { data, error } = await supabase
+                .storage
+                .from('user-files')
+                .list(userId + '/', { limit: 100 });
+            const filesList = document.getElementById('files-list');
+            filesList.innerHTML = '';
+            if (!error && data.length > 0) {
+                data.forEach(file => {
+                    const li = document.createElement('li');
+                    li.textContent = file.name;
+                    filesList.appendChild(li);
+                });
+            } else {
+                filesList.innerHTML = '<li>No files found.</li>';
+            }
+        }
 
-        <section id="upload-section" class="page">
-            <h2>Upload New Files</h2>
-            <form id="upload-form">
-                <label for="file-input">Select File(s):</label>
-                <input type="file" id="file-input" name="files" multiple>
-                <p>Supported formats: PDF, DOCX, JPG, PNG, etc.</p>
-                <button type="submit">Upload</button>
-            </form>
-            <div id="upload-status" style="display: none; margin-top: 15px;">
-                <p>Status here...</p>
-            </div>
-        </section>
+        async function loadNotes(userId) {
+            const { data, error } = await supabase
+                .from('notes')
+                .select('content')
+                .eq('user_id', userId);
+            const notesList = document.getElementById('notes-list');
+            notesList.innerHTML = '';
+            if (!error && data.length > 0) {
+                data.forEach(note => {
+                    const li = document.createElement('li');
+                    li.textContent = note.content;
+                    notesList.appendChild(li);
+                });
+            } else {
+                notesList.innerHTML = '<li>No notes found.</li>';
+            }
+        }
 
-        <section id="notes-section" class="page">
-            <h2>My Notes</h2>
-            <div class="note-editor">
-                <h3>New Note</h3>
-                <textarea id="note-editor-textarea" placeholder="Start typing your note here..." rows="10"></textarea>
-                <button id="save-note-btn">Save Note</button>
-            </div>
-            <div class="saved-notes">
-                <h3>Saved Notes</h3>
-                <ul id="saved-notes-list"></ul>
-            </div>
-        </section>
-    </main>
-
-    <footer>
-        <p>&copy; 2025 My Personal Vault. All rights reserved.</p>
-    </footer>
-
-    <script src="script.js"></script>
+        loadDashboard();
+    </script>
 </body>
 </html>
