@@ -1,8 +1,4 @@
-import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
-
-const supabaseUrl = 'https://knmpxdnjaypqgzvjtdpt.supabase.co';
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtubXB4ZG5qYXlwcWd6dmp0ZHB0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI1MzY1ODAsImV4cCI6MjA2ODExMjU4MH0.nBOyp6hiRg2-3eLvucUKjXelVMtdhhhJEZKsxrA7gGs';
-const supabase = createClient(supabaseUrl, supabaseKey);
+const supabase = supabase.createClient('https://knmpxdnjaypqgzvjtdpt.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtubXB4ZG5qYXlwcWd6dmp0ZHB0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI1MzY1ODAsImV4cCI6MjA2ODExMjU4MH0.nBOyp6hiRg2-3eLvucUKjXelVMtdhhhJEZKsxrA7gGs');
 
 document.addEventListener('DOMContentLoaded', () => {
     const loginSection = document.getElementById('login-section');
