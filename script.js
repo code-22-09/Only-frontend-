@@ -1,4 +1,7 @@
-const supabase = supabase.createClient('https://knmpxdnjaypqgzvjtdpt.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtubXB4ZG5qYXlwcWd6dmp0ZHB0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI1MzY1ODAsImV4cCI6MjA2ODExMjU4MH0.nBOyp6hiRg2-3eLvucUKjXelVMtdhhhJEZKsxrA7gGs');
+const client = supabase.createClient(
+    'https://knmpxdnjaypqgzvjtdpt.supabase.co',
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtubXB4ZG5qYXlwcWd6dmp0ZHB0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI1MzY1ODAsImV4cCI6MjA2ODExMjU4MH0.nBOyp6hiRg2-3eLvucUKjXelVMtdhhhJEZKsxrA7gGs'
+);
 
 document.addEventListener('DOMContentLoaded', () => {
     const loginSection = document.getElementById('login-section');
@@ -66,7 +69,7 @@ document.addEventListener('DOMContentLoaded', () => {
         else alert('Please login first.');
     });
     navLogoutBtn.addEventListener('click', async () => {
-        await supabase.auth.signOut();
+        await client.auth.signOut();
         alert('Logged out successfully.');
         setLoggedOutState();
     });
@@ -76,7 +79,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const email = usernameInput.value;
         const password = passwordInput.value;
 
-        const { data, error } = await supabase.auth.signInWithPassword({
+        const { data, error } = await client.auth.signInWithPassword({
             email,
             password
         });
@@ -94,7 +97,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const email = usernameInput.value;
         const password = passwordInput.value;
 
-        const { error } = await supabase.auth.signUp({
+        const { error } = await client.auth.signUp({
             email,
             password
         });
@@ -111,7 +114,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const files = document.getElementById('file-input').files;
         if (files.length > 0) {
             for (const file of files) {
-                const { error } = await supabase.storage.from('user-files').upload(`${currentUser.id}/${file.name}`, file);
+                const { error } = await client.storage.from('user-files').upload(`${currentUser.id}/${file.name}`, file);
                 if (error) {
                     alert('Error uploading: ' + file.name);
                 }
@@ -127,11 +130,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function loadFiles() {
         if (!currentUser) return;
-        const { data } = await supabase.storage.from('user-files').list(`${currentUser.id}/`);
+        const { data } = await client.storage.from('user-files').list(`${currentUser.id}/`);
         filesContainer.innerHTML = '';
         data?.forEach(file => {
             const li = document.createElement('li');
-            li.innerHTML = `<a href="${supabase.storage.from('user-files').getPublicUrl(`${currentUser.id}/${file.name}`).data.publicUrl}" target="_blank">${file.name}</a>`;
+            li.innerHTML = `<a href="${client.storage.from('user-files').getPublicUrl(`${currentUser.id}/${file.name}`).data.publicUrl}" target="_blank">${file.name}</a>`;
             filesContainer.appendChild(li);
         });
     }
@@ -142,7 +145,7 @@ document.addEventListener('DOMContentLoaded', () => {
             alert('Note content cannot be empty.');
             return;
         }
-        await supabase.from('notes').insert({
+        await client.from('notes').insert({
             user_id: currentUser.id,
             title: 'Untitled',
             content: noteContent
@@ -154,7 +157,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function loadNotes() {
         if (!currentUser) return;
-        const { data } = await supabase.from('notes').select().eq('user_id', currentUser.id);
+        const { data } = await client.from('notes').select().eq('user_id', currentUser.id);
         notesContainer.innerHTML = '';
         data?.forEach(note => {
             const li = document.createElement('li');
@@ -164,7 +167,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     (async () => {
-        const { data } = await supabase.auth.getSession();
+        const { data } = await client.auth.getSession();
         if (data.session) {
             currentUser = data.session.user;
             setLoggedInState();
